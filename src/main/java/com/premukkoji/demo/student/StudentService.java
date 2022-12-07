@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class StudentService {
 
-    private StudentRepository studentRepository;
+    private final StudentRepository studentRepository;
 
     @Autowired
     public StudentService(StudentRepository studentRepository) {
@@ -24,9 +24,9 @@ public class StudentService {
     }
 
     public void addNewStudent(Student student) {
-        Optional<Student> studentByEmail = studentRepository.findStudentByEmail(student.getEmail());
+        Boolean exists = studentRepository.isStudentPresentByEmail(student.getEmail());
 
-        if (studentByEmail.isPresent()) {
+        if (exists) {
             throw new IllegalStateException("email taken");
         }
 
@@ -34,7 +34,7 @@ public class StudentService {
     }
 
     public void deleteStudent(Long studentId) {
-        Boolean exists = studentRepository.existsById(studentId);
+        boolean exists = studentRepository.existsById(studentId);
 
         if (!exists)
             throw new IllegalStateException("student with id=" + studentId + " does not exists");
