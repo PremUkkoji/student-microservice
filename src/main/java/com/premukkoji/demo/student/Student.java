@@ -1,5 +1,6 @@
 package com.premukkoji.demo.student;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.Period;
 
@@ -20,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @Table
-public class Student {
+public class Student implements Serializable {
 
     @Id
     @SequenceGenerator(name = "student_sequence", sequenceName = "student_sequence", allocationSize = 1)

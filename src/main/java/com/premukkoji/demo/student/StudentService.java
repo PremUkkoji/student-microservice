@@ -6,9 +6,14 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class StudentService {
 
@@ -23,6 +28,12 @@ public class StudentService {
         return studentRepository.findAll();
     }
 
+    @Cacheable(value = "students", key = "#studentId")
+    public Optional<Student> getStudent(Long studentId) {
+        log.info("Fetching student with " + studentId + " from DB");
+        return studentRepository.findById(studentId);
+    }
+
     public void addNewStudent(Student student) {
         Boolean exists = studentRepository.isStudentPresentByEmail(student.getEmail());
 
@@ -33,6 +44,7 @@ public class StudentService {
         studentRepository.save(student);
     }
 
+    @CacheEvict(value = "students", key = "#studentId", allEntries = true)
     public void deleteStudent(Long studentId) {
         boolean exists = studentRepository.existsById(studentId);
 
@@ -42,8 +54,9 @@ public class StudentService {
         studentRepository.deleteById(studentId);
     }
 
+    @CachePut(value = "students", key = "#studentId")
     @Transactional
-    public void updateStudent(Long studentId, String name, String email) {
+    public Student updateStudent(Long studentId, String name, String email) {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> {
                     throw new IllegalStateException("student with id=" + studentId + " does not exists");
@@ -61,5 +74,7 @@ public class StudentService {
             }
             student.setEmail(email);
         }
+
+        return student;
     }
 }

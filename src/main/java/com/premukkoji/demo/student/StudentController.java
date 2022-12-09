@@ -1,8 +1,14 @@
 package com.premukkoji.demo.student;
 
 import java.util.List;
+import java.util.Optional;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,6 +35,11 @@ public class StudentController {
         return studentService.getStudents();
     }
 
+    @GetMapping("/{studentId}")
+    public Optional<Student> getStudent(@PathVariable Long studentId) {
+        return studentService.getStudent(studentId);
+    }
+
     @PostMapping("/")
     public void registerNewStudent(@RequestBody Student student) {
         studentService.addNewStudent(student);
@@ -39,11 +50,11 @@ public class StudentController {
         studentService.deleteStudent(studentId);
     }
 
-    @PutMapping("/{studentId}/")
-    public void updateStudent(
+    @PutMapping(value = "/{studentId}/")
+    public Student updateStudent(
             @PathVariable("studentId") Long studentId,
             @RequestParam(required = true) String name,
             @RequestParam(required = true) String email) {
-        studentService.updateStudent(studentId, name, email);
+        return studentService.updateStudent(studentId, name, email);
     }
 }
